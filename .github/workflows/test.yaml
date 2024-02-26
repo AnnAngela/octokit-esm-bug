@@ -1,0 +1,33 @@
+name: test
+
+on:
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          check-latest: true
+          cache: npm
+      - name: Installing the dependencies
+        run: npm ci
+      - name: import @octokit/plugin-retry
+        continue-on-error: true
+        run: node octokit.js
+      - name: import bottleneck/light buggy
+        continue-on-error: true
+        run: node bottleneck_light-bug.js
+      - name: import bottleneck/light
+        continue-on-error: true
+        run: node bottleneck_light-good.js
